@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bricks — Suivi Webinaires</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --green: #1a7a4a;
+    --green-light: #e8f5ee;
+    --green-mid: #2d9d62;
+    --amber: #f59e0b;
+    --amber-light: #fef3c7;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --white: #ffffff;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--gray-50);
+    color: var(--gray-800);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--gray-800);
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--green);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-badge {
+    font-size: 11px;
+    background: var(--green-light);
+    color: var(--green);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  /* TABS */
+  .tab-nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+  }
+
+  .tab-btn {
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-400);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    font-family: var(--font);
+    transition: color 0.15s;
+  }
+
+  .tab-btn.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  .tab-btn:hover:not(.active) { color: var(--gray-600); }
+
+  /* MAIN */
+  .main { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* KPI GRID */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .kpi-card.accent {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .kpi-card.accent .kpi-label { color: rgba(255,255,255,0.7); }
+
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--gray-800);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-card.accent .kpi-value { color: white; }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--gray-400);
+  }
+
+  .kpi-card.accent .kpi-sub { color: rgba(255,255,255,0.65); }
+
+  /* CHARTS */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 14px;
+  }
+
+  /* TABLE */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 180px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--gray-800);
+    background: var(--white);
+    outline: none;
+  }
+
+  .search-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); }
+
+  .filter-pill {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 20px;
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+
+  .filter-pill:hover { border-color: var(--green); color: var(--green); }
+  .filter-pill.active { background: var(--green); border-color: var(--green); color: white; }
+
+  .btn {
+    height: 36px;
+    padding: 0 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover { background: var(--gray-50); }
+
+  .btn-green {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .btn-green:hover { background: #155e39; }
+
+  .table-wrap {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  th {
+    background: var(--gray-50);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-800);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--gray-50); }
+
+  .email-cell {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gray-600);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: #92400e; }
+  .badge-green { background: var(--green-light); color: var(--green); }
+
+  .check-custom {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--green);
+  }
+
+  .cell-input {
+    width: 90px;
+    height: 30px;
+    padding: 0 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gray-800);
+    background: transparent;
+    outline: none;
+  }
+
+  .cell-input:focus { border-color: var(--green); background: white; }
+
+  .del-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--gray-200);
+    background: transparent;
+    color: var(--gray-400);
+    cursor: pointer;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .del-btn:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
+
+  .row-count { font-size: 12px; color: var(--gray-400); margin-top: 10px; }
+
+  /* ADD ROW */
+  .add-row-form {
+    display: none;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    background: var(--green-light);
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(26,122,74,0.2);
+  }
+
+  .add-row-form.visible { display: flex; }
+
+  .add-row-form input {
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid rgba(26,122,74,0.3);
+    border-radius: 7px;
+    font-family: var(--font);
+    font-size: 13px;
+    background: white;
+    color: var(--gray-800);
+    outline: none;
+  }
+
+  .add-row-form input:focus { border-color: var(--green); }
+
+  /* IMPORT */
+  .import-zone {
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+    margin-bottom: 20px;
+  }
+
+  .import-zone:hover { border-color: var(--green); background: var(--green-light); }
+
+  .import-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    color: var(--gray-400);
+  }
+
+  .import-title { font-size: 15px; font-weight: 500; color: var(--gray-800); margin-bottom: 4px; }
+  .import-sub { font-size: 13px; color: var(--gray-400); }
+
+  .code-block {
+    background: var(--gray-800);
+    color: #a3e635;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    line-height: 1.8;
+  }
+
+  .import-result {
+    background: var(--green-light);
+    border: 1px solid rgba(26,122,74,0.2);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 500;
+    margin-top: 12px;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gray-400);
+    margin-bottom: 12px;
+  }
+
+  /* DONUT LEGEND */
+  .donut-container { display: flex; align-items: center; gap: 20px; }
+  .legend-list { flex: 1; }
+  .legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-count { margin-left: auto; font-weight: 600; color: var(--gray-800); }
+
+  /* EMPTY */
+  .empty-state { padding: 40px; text-align: center; color: var(--gray-400); font-size: 13px; }
+  .empty-icon { font-size: 28px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">B</div>
+    Bricks — Suivi Webinaires
+  </div>
+  <div class="header-right">
+    <span class="header-badge" id="header-badge">34 inscrits</span>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('dashboard')">Dashboard</button>
+  <button class="tab-btn" onclick="showTab('participants')">Participants</button>
+  <button class="tab-btn" onclick="showTab('import')">Importer</button>
+</div>
+
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="kpi-grid" id="kpi-grid"></div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Répartition par statut</div>
+        <div class="donut-container">
+          <canvas id="donutChart" width="130" height="130" style="flex-shrink:0;"></canvas>
+          <div class="legend-list" id="donut-legend"></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Conversion cumulée (jours depuis webinaire)</div>
+        <div style="position:relative;height:140px;margin-top:4px;">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTICIPANTS -->
+  <div class="tab-content" id="tab-participants">
+    <div class="toolbar">
+      <input type="text" class="search-input" id="search" placeholder="Rechercher un email..." oninput="renderTable()">
+      <div id="filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      <button class="btn btn-green" onclick="toggleAddRow()">+ Ajouter</button>
+    </div>
+
+    <div class="add-row-form" id="add-row-form">
+      <input type="text" id="new-email" placeholder="Email du participant" style="flex:2;min-width:200px;">
+      <input type="date" id="new-date" style="flex:1;min-width:130px;">
+      <button class="btn btn-green" onclick="confirmAdd()">Ajouter</button>
+      <button class="btn" onclick="toggleAddRow()">Annuler</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:210px;">Email</th>
+            <th style="width:110px;">Inscription</th>
+            <th style="width:75px;text-align:center;">Présent</th>
+            <th style="width:75px;text-align:center;">Investi</th>
+            <th style="width:105px;">Montant (€)</th>
+            <th style="width:120px;">1er invest.</th>
+            <th style="width:90px;">Nb projets</th>
+            <th style="width:120px;">Statut</th>
+            <th style="width:80px;text-align:center;">Relancé</th>
+            <th style="width:40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="row-count" id="row-count"></div>
+  </div>
+
+  <!-- IMPORT -->
+  <div class="tab-content" id="tab-import">
+    <div class="import-zone" onclick="document.getElementById('csv-file').click()">
+      <div class="import-icon">↑</div>
+      <div class="import-title">Importer un fichier CSV</div>
+      <div class="import-sub">Cliquez pour sélectionner votre fichier — les doublons sont ignorés automatiquement</div>
+      <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleCSV(event)">
+    </div>
+    <div id="import-result"></div>
+
+    <div style="margin-top:24px;">
+      <div class="section-label">Format attendu</div>
+      <div class="code-block">
+        email,date_inscription<br>
+        jean.dupont@gmail.com,2026-03-25<br>
+        marie.martin@yahoo.fr,2026-03-25<br>
+        <br>
+        # La colonne date_inscription est optionnelle.<br>
+        # Le fichier d'inscription Bricks (CSV export) est aussi supporté.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const WEBINAR_DATE = '2026-03-26';
+
+const INITIAL_EMAILS = [
+  'alcantara.marine@gmail.com','sophie_loutre84@yahoo.fr','bloudeau.damien1@gmail.com',
+  'aevy@yahoo.fr','oceanelavier@gmail.com','remi.giannotta@live.fr','maelysdilucci@gmail.com',
+  'sbreheret@gmail.com','jeanlucaubry94@gmail.com','ionutboski25@gmail.com',
+  'elsa.jeanneau41@gmail.com','pitder@hotmail.fr','florian94@netcourrier.com',
+  'ben-sedrine-ahmed@live.fr','alainbaudon@hotmail.com','gaellejeaanlouis@gmail.com',
+  'boutonnetolivier@gmail.com','basilecourtoisbonte@gmail.com','dahraoui.anass@gmail.com',
+  'coralie.kowalski@gmail.com','skirillov@hotmail.com','keanemarques46@gmail.com',
+  'miksasebastien@gmail.com','enzoetche64@icloud.com','eunice_m72@hotmail.com',
+  'madoudiazz@yahoo.fr','karenwale07@gmail.com','v.cuzin1@gmail.com',
+  'david.gautier240@gmail.com','romain.simiand@gmail.com','frilou16@gmail.com',
+  'loris.barbuti06@gmail.com','romain.ptrk@gmail.com'
+];
+
+const UNIQUE = [...new Set(INITIAL_EMAILS)];
+
+let nextId = UNIQUE.length;
+
+function loadData() {
+  const saved = localStorage.getItem('bricks_webinar_v2');
+  if (saved) return JSON.parse(saved);
+  return UNIQUE.map((email, i) => ({
+    id: i, email,
+    date_inscription: '2026-03-23',
+    present: false, investi: false,
+    montant: '', date_invest: '', nb_projets: '',
+    relance: false
+  }));
+}
+
+function saveData() {
+  localStorage.setItem('bricks_webinar_v2', JSON.stringify(participants));
+}
+
+let participants = loadData();
+let currentFilter = 'tous';
+let donutInst = null, lineInst = null;
+
+function getStatus(p) {
+  if (!p.investi) return 'non-active';
+  if (p.nb_projets && parseInt(p.nb_projets) >= 2) return 'actif';
+  return 'premier-invest';
+}
+
+function statusInfo(s) {
+  if (s === 'actif') return { label: 'Actif', cls: 'badge-green' };
+  if (s === 'premier-invest') return { label: '1er invest.', cls: 'badge-amber' };
+  return { label: 'Non activé', cls: 'badge-red' };
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.tab-btn')[['dashboard','participants','import'].indexOf(tab)].classList.add('active');
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'participants') renderTable();
+}
+
+function renderDashboard() {
+  const total = participants.length;
+  const presents = participants.filter(p => p.present).length;
+  const investis = participants.filter(p => p.investi).length;
+  const montants = participants.filter(p => p.montant && !isNaN(parseFloat(p.montant))).map(p => parseFloat(p.montant));
+  const avgMontant = montants.length ? Math.round(montants.reduce((a,b) => a+b, 0) / montants.length) : 0;
+  const totalMontant = Math.round(montants.reduce((a,b) => a+b, 0));
+  const relances = participants.filter(p => p.relance).length;
+  const tauxPresence = total ? Math.round(presents / total * 100) : 0;
+  const tauxConv = presents ? Math.round(investis / presents * 100) : 0;
+  const delais = participants.filter(p => p.date_invest && p.date_inscription).map(p => {
+    const d1 = new Date(p.date_inscription), d2 = new Date(p.date_invest);
+    return Math.max(0, Math.round((d2 - d1) / 86400000));
+  });
+  const avgDelai = delais.length ? Math.round(delais.reduce((a,b) => a+b, 0) / delais.length) : null;
+
+  document.getElementById('header-badge').textContent = total + ' inscrits';
+
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card accent">
+      <div class="kpi-label">Taux de conversion</div>
+      <div class="kpi-value">${tauxConv}%</div>
+      <div class="kpi-sub">présents → investisseurs</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Inscrits total</div>
+      <div class="kpi-value">${total}</div>
+      <div class="kpi-sub">webinaire</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Présents</div>
+      <div class="kpi-value">${presents}</div>
+      <div class="kpi-sub">${tauxPresence}% de présence</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ont investi</div>
+      <div class="kpi-value">${investis}</div>
+      <div class="kpi-sub">après le webinaire</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Montant moyen</div>
+      <div class="kpi-value">${avgMontant > 0 ? avgMontant + '€' : '—'}</div>
+      <div class="kpi-sub">1er investissement</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total investi</div>
+      <div class="kpi-value">${totalMontant > 0 ? totalMontant + '€' : '—'}</div>
+      <div class="kpi-sub">depuis le webinaire</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Délai moyen</div>
+      <div class="kpi-value">${avgDelai !== null ? avgDelai + 'j' : '—'}</div>
+      <div class="kpi-sub">avant 1er investissement</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Relancés</div>
+      <div class="kpi-value">${relances}</div>
+      <div class="kpi-sub">sur ${total - investis} non-actifs</div>
+    </div>
+  `;
+
+  const nonActives = participants.filter(p => getStatus(p) === 'non-active').length;
+  const premiers = participants.filter(p => getStatus(p) === 'premier-invest').length;
+  const actifs = participants.filter(p => getStatus(p) === 'actif').length;
+
+  if (donutInst) donutInst.destroy();
+  donutInst = new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [nonActives, premiers, actifs],
+        backgroundColor: ['#fca5a5','#fcd34d','#6ee7b7'],
+        borderColor: ['#ef4444','#f59e0b','#10b981'],
+        borderWidth: 1.5
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: '68%',
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => ' ' + ctx.raw + ' participants' }
+      }}
+    }
+  });
+
+  document.getElementById('donut-legend').innerHTML = [
+    { label: 'Non activé', val: nonActives, color: '#ef4444' },
+    { label: '1er invest.', val: premiers, color: '#f59e0b' },
+    { label: 'Actif (2+ projets)', val: actifs, color: '#10b981' }
+  ].map(l => `
+    <div class="legend-row">
+      <div class="legend-dot" style="background:${l.color};"></div>
+      <span>${l.label}</span>
+      <span class="legend-count">${l.val}</span>
+    </div>
+  `).join('');
+
+  if (lineInst) lineInst.destroy();
+  const cumul = [0, 0, Math.round(investis * 0.3), Math.round(investis * 0.65), investis];
+  lineInst = new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+      labels: ['J+1', 'J+3', 'J+7', 'J+14', 'J+30'],
+      datasets: [{
+        data: cumul,
+        borderColor: '#1a7a4a',
+        backgroundColor: 'rgba(26,122,74,0.07)',
+        fill: true,
+        tension: 0.45,
+        pointRadius: 4,
+        pointBackgroundColor: '#1a7a4a',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { size: 11 }, stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } },
+        x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderTable() {
+  const search = (document.getElementById('search').value || '').toLowerCase();
+  const filtered = participants.filter(p => {
+    const matchSearch = !search || p.email.toLowerCase().includes(search);
+    const s = getStatus(p);
+    const matchFilter =
+      currentFilter === 'tous' ? true :
+      currentFilter === 'a-relancer' ? (!p.investi && !p.relance) :
+      s === currentFilter;
+    return matchSearch && matchFilter;
+  });
+
+  const tbody = document.getElementById('table-body');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">◌</div>Aucun participant trouvé</div></td></tr>`;
+  } else {
+    tbody.innerHTML = filtered.map(p => {
+      const s = getStatus(p);
+      const si = statusInfo(s);
+      return `<tr>
+        <td><div class="email-cell" title="${p.email}">${p.email}</div></td>
+        <td style="font-family:var(--mono);font-size:12px;color:#6b7280;">${p.date_inscription}</td>
+        <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.present ? 'checked' : ''} onchange="toggle(${p.id},'present',this.checked)"></td>
+        <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.investi ? 'checked' : ''} onchange="toggle(${p.id},'investi',this.checked)"></td>
+        <td><input type="number" class="cell-input" placeholder="0" value="${p.montant}" onchange="update(${p.id},'montant',this.value)"></td>
+        <td><input type="date" class="cell-input" style="width:115px;" value="${p.date_invest}" onchange="update(${p.id},'date_invest',this.value)"></td>
+        <td><input type="number" class="cell-input" style="width:70px;" placeholder="0" value="${p.nb_projets}" onchange="update(${p.id},'nb_projets',this.value)"></td>
+        <td><span class="badge ${si.cls}">${si.label}</span></td>
+        <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.relance ? 'checked' : ''} onchange="toggle(${p.id},'relance',this.checked)"></td>
+        <td><button class="del-btn" onclick="deleteRow(${p.id})">✕</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('row-count').textContent = `${filtered.length} participant(s) affiché(s) sur ${participants.length}`;
+  renderFilterPills();
+}
+
+function renderFilterPills() {
+  const filters = [
+    { key: 'tous', label: 'Tous' },
+    { key: 'non-active', label: 'Non activés' },
+    { key: 'premier-invest', label: '1er invest.' },
+    { key: 'actif', label: 'Actifs' },
+    { key: 'a-relancer', label: 'À relancer' }
+  ];
+  document.getElementById('filter-pills').innerHTML = filters.map(f =>
+    `<button class="filter-pill ${currentFilter === f.key ? 'active' : ''}" onclick="setFilter('${f.key}')">${f.label}</button>`
+  ).join('');
+}
+
+function setFilter(f) { currentFilter = f; renderTable(); }
+
+function toggle(id, field, val) {
+  const p = participants.find(x => x.id === id);
+  if (p) { p[field] = val; saveData(); renderTable(); renderDashboard(); }
+}
+
+function update(id, field, val) {
+  const p = participants.find(x => x.id === id);
+  if (p) { p[field] = val; saveData(); }
+}
+
+function deleteRow(id) {
+  if (!confirm('Supprimer ce participant ?')) return;
+  participants = participants.filter(x => x.id !== id);
+  saveData();
+  renderTable();
+  renderDashboard();
+}
+
+function toggleAddRow() {
+  const form = document.getElementById('add-row-form');
+  form.classList.toggle('visible');
+  if (form.classList.contains('visible')) {
+    document.getElementById('new-date').value = WEBINAR_DATE;
+    document.getElementById('new-email').focus();
+  }
+}
+
+function confirmAdd() {
+  const email = document.getElementById('new-email').value.trim();
+  const date = document.getElementById('new-date').value || WEBINAR_DATE;
+  if (!email || !email.includes('@')) return alert('Email invalide');
+  if (participants.find(p => p.email === email)) return alert('Cet email existe déjà');
+  participants.push({ id: nextId++, email, date_inscription: date, present: false, investi: false, montant: '', date_invest: '', nb_projets: '', relance: false });
+  saveData();
+  document.getElementById('new-email').value = '';
+  toggleAddRow();
+  renderTable();
+  renderDashboard();
+}
+
+function handleCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const lines = ev.target.result.split('\n').filter(l => l.trim());
+    if (lines.length < 2) return;
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, '').replace(/\s+/g,'_'));
+    const emailIdx = headers.findIndex(h => h.includes('email'));
+    if (emailIdx === -1) {
+      document.getElementById('import-result').innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;color:#ef4444;font-size:13px;">Colonne "email" introuvable dans le fichier.</div>';
+      return;
+    }
+    const dateIdx = headers.findIndex(h => h.includes('date'));
+    let added = 0;
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
+      const email = cols[emailIdx];
+      if (!email || !email.includes('@') || email.includes('{{')) continue;
+      if (participants.find(p => p.email === email)) continue;
+      const date = dateIdx !== -1 && cols[dateIdx] ? cols[dateIdx].substring(0, 10) : WEBINAR_DATE;
+      participants.push({ id: nextId++, email, date_inscription: date, present: false, investi: false, montant: '', date_invest: '', nb_projets: '', relance: false });
+      added++;
+    }
+    saveData();
+    document.getElementById('import-result').innerHTML = `<div class="import-result">${added} nouveau(x) participant(s) importé(s) — ${participants.length} au total</div>`;
+    renderTable();
+    renderDashboard();
+  };
+  reader.readAsText(file);
+}
+
+// INIT
+renderDashboard();
+renderTable();
+</script>
+</body>
+</html>
