@@ -6,36 +6,39 @@
 <title>Bricks — Suivi Webinaires</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   :root {
-    --green: #1a7a4a;
-    --green-light: #e8f5ee;
-    --green-mid: #2d9d62;
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface-2: #1f1f1f;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.16);
+    --text: #ffffff;
+    --text-secondary: rgba(255,255,255,0.65);
+    --text-muted: rgba(255,255,255,0.35);
+    --accent: #ff4d00;
+    --accent-hover: #e64400;
+    --accent-dim: rgba(255,77,0,0.12);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
     --amber: #f59e0b;
-    --amber-light: #fef3c7;
+    --amber-dim: rgba(245,158,11,0.12);
     --red: #ef4444;
-    --red-light: #fef2f2;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-400: #9ca3af;
-    --gray-600: #4b5563;
-    --gray-800: #1f2937;
-    --white: #ffffff;
-    --font: 'DM Sans', sans-serif;
-    --mono: 'DM Mono', monospace;
+    --red-dim: rgba(239,68,68,0.12);
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.12);
+    --font: 'Inter', sans-serif;
     --radius: 10px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: var(--font);
-    background: var(--gray-50);
-    color: var(--gray-800);
+    background: var(--bg);
+    color: var(--text);
     font-size: 14px;
     line-height: 1.5;
     min-height: 100vh;
@@ -43,8 +46,8 @@
 
   /* HEADER */
   .header {
-    background: var(--white);
-    border-bottom: 1px solid var(--gray-200);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     padding: 0 24px;
     display: flex;
     align-items: center;
@@ -59,74 +62,174 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 15px;
-    color: var(--gray-800);
+    color: var(--text);
+    letter-spacing: -0.01em;
   }
 
   .logo-icon {
-    width: 28px;
-    height: 28px;
-    background: var(--green);
+    width: 28px; height: 28px;
+    background: var(--accent);
     border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 13px; font-weight: 800;
   }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .header-right { display: flex; align-items: center; gap: 10px; }
 
   .header-badge {
     font-size: 11px;
-    background: var(--green-light);
-    color: var(--green);
+    background: var(--accent-dim);
+    color: var(--accent);
     padding: 3px 10px;
     border-radius: 20px;
-    font-weight: 500;
+    font-weight: 600;
+    border: 1px solid rgba(255,77,0,0.2);
   }
+
+  /* SYNC STATUS */
+  .sync-status {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    cursor: default;
+  }
+
+  .sync-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .sync-status.syncing .sync-dot { background: var(--amber); animation: pulse 1s infinite; }
+  .sync-status.synced  .sync-dot { background: var(--green); }
+  .sync-status.error   .sync-dot { background: var(--red); }
+  .sync-status.local   .sync-dot { background: var(--text-muted); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .icon-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--border-hover); color: var(--text); background: var(--surface); }
 
   /* TABS */
   .tab-nav {
-    background: var(--white);
-    border-bottom: 1px solid var(--gray-200);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     padding: 0 24px;
     display: flex;
-    gap: 0;
   }
 
   .tab-btn {
-    padding: 12px 18px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray-400);
-    border: none;
-    background: none;
-    cursor: pointer;
+    padding: 14px 18px;
+    font-size: 13px; font-weight: 500;
+    color: var(--text-muted);
+    border: none; background: none; cursor: pointer;
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
     font-family: var(--font);
     transition: color 0.15s;
   }
-
-  .tab-btn.active {
-    color: var(--green);
-    border-bottom-color: var(--green);
-  }
-
-  .tab-btn:hover:not(.active) { color: var(--gray-600); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text-secondary); }
 
   /* MAIN */
-  .main { padding: 24px; max-width: 1200px; margin: 0 auto; }
-
+  .main { padding: 24px; max-width: 1300px; margin: 0 auto; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    width: 100%; max-width: 520px;
+    margin: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+
+  .modal-title {
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 6px; color: var(--text);
+  }
+  .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+  .modal-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin-bottom: 6px; display: block;
+  }
+
+  .modal-input {
+    width: 100%; height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: var(--font); font-size: 13px;
+    outline: none; margin-bottom: 16px;
+  }
+  .modal-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .modal-input::placeholder { color: var(--text-muted); }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+  .steps {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 2;
+  }
+  .steps strong { color: var(--text); }
+
+  /* BANNER */
+  .connect-banner {
+    background: var(--accent-dim);
+    border: 1px solid rgba(255,77,0,0.2);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+    font-size: 13px; color: var(--text-secondary);
+  }
+  .connect-banner-icon { font-size: 20px; flex-shrink: 0; }
+  .connect-banner strong { color: var(--text); }
+  .connect-banner .btn-link {
+    margin-left: auto; flex-shrink: 0;
+    background: var(--accent); border: none; color: white;
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: var(--font);
+    white-space: nowrap;
+  }
 
   /* KPI GRID */
   .kpi-grid {
@@ -137,345 +240,250 @@
   }
 
   .kpi-card {
-    background: var(--white);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: var(--shadow);
-  }
-
-  .kpi-card.accent {
-    background: var(--green);
-    border-color: var(--green);
-    color: white;
-  }
-
-  .kpi-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-  }
-
-  .kpi-card.accent .kpi-label { color: rgba(255,255,255,0.7); }
-
-  .kpi-value {
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--gray-800);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .kpi-card.accent .kpi-value { color: white; }
-
-  .kpi-sub {
-    font-size: 11px;
-    color: var(--gray-400);
-  }
-
-  .kpi-card.accent .kpi-sub { color: rgba(255,255,255,0.65); }
-
-  /* CHARTS */
-  .charts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
-
-  .chart-card {
-    background: var(--white);
-    border: 1px solid var(--gray-200);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 18px;
     box-shadow: var(--shadow);
   }
+  .kpi-card.accent { background: var(--accent); border-color: var(--accent); }
+  .kpi-card.kpi-blue { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 0 1px rgba(59,130,246,0.1); }
 
+  .kpi-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-bottom: 8px;
+  }
+  .kpi-card.accent .kpi-label { color: rgba(255,255,255,0.65); }
+  .kpi-card.kpi-blue .kpi-label { color: var(--blue); }
+
+  .kpi-value {
+    font-size: 28px; font-weight: 700;
+    color: var(--text); line-height: 1;
+    margin-bottom: 5px; letter-spacing: -0.02em;
+  }
+  .kpi-card.accent .kpi-value { color: white; }
+  .kpi-card.kpi-blue .kpi-value { color: var(--blue); }
+
+  .kpi-sub { font-size: 11px; color: var(--text-muted); }
+  .kpi-card.accent .kpi-sub { color: rgba(255,255,255,0.6); }
+
+  /* CHARTS */
+  .charts-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 24px;
+  }
+  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
   .chart-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray-600);
-    margin-bottom: 14px;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 16px;
   }
 
   /* TABLE */
   .toolbar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-    align-items: center;
+    display: flex; gap: 8px;
+    margin-bottom: 12px; flex-wrap: wrap; align-items: center;
   }
 
   .search-input {
-    flex: 1;
-    min-width: 180px;
-    height: 36px;
+    flex: 1; min-width: 180px; height: 36px;
     padding: 0 12px;
-    border: 1px solid var(--gray-200);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    font-family: var(--font);
-    font-size: 13px;
-    color: var(--gray-800);
-    background: var(--white);
-    outline: none;
+    font-family: var(--font); font-size: 13px;
+    color: var(--text); background: var(--surface); outline: none;
   }
-
-  .search-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 
   .filter-pill {
-    height: 32px;
-    padding: 0 12px;
+    height: 32px; padding: 0 12px;
     border-radius: 20px;
-    border: 1px solid var(--gray-200);
-    background: var(--white);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--gray-600);
-    cursor: pointer;
-    font-family: var(--font);
-    transition: all 0.15s;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12px; font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer; font-family: var(--font); transition: all 0.15s;
   }
-
-  .filter-pill:hover { border-color: var(--green); color: var(--green); }
-  .filter-pill.active { background: var(--green); border-color: var(--green); color: white; }
+  .filter-pill:hover { border-color: var(--border-hover); color: var(--text); }
+  .filter-pill.active { background: var(--accent); border-color: var(--accent); color: white; }
 
   .btn {
-    height: 36px;
-    padding: 0 14px;
+    height: 36px; padding: 0 14px;
     border-radius: var(--radius);
-    border: 1px solid var(--gray-200);
-    background: var(--white);
-    font-family: var(--font);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray-700);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: var(--font); font-size: 13px; font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer; transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
   }
-
-  .btn:hover { background: var(--gray-50); }
-
-  .btn-green {
-    background: var(--green);
-    border-color: var(--green);
-    color: white;
-  }
-
-  .btn-green:hover { background: #155e39; }
+  .btn:hover { background: var(--surface-2); border-color: var(--border-hover); color: var(--text); }
+  .btn-accent { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: white; }
 
   .table-wrap {
-    background: var(--white);
-    border: 1px solid var(--gray-200);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    overflow-x: auto;
+    overflow: hidden; box-shadow: var(--shadow); overflow-x: auto;
   }
 
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
   th {
-    background: var(--gray-50);
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gray-400);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid var(--gray-200);
-    white-space: nowrap;
+    background: var(--surface-2);
+    padding: 10px 12px; text-align: left;
+    font-size: 10px; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
   }
 
   td {
     padding: 9px 12px;
-    border-bottom: 1px solid var(--gray-100);
-    color: var(--gray-800);
-    vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+    color: var(--text); vertical-align: middle;
   }
-
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--gray-50); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
 
   .email-cell {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--gray-600);
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 13px; color: var(--text-secondary);
+    max-width: 200px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
   }
 
   .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
   }
+  .badge-red   { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(239,68,68,0.2); }
+  .badge-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+  .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .badge-blue  { background: var(--blue-dim);  color: var(--blue);  border: 1px solid rgba(59,130,246,0.2); }
 
-  .badge-red { background: var(--red-light); color: var(--red); }
-  .badge-amber { background: var(--amber-light); color: #92400e; }
-  .badge-green { background: var(--green-light); color: var(--green); }
-
-  .check-custom {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--green);
-  }
+  .check-custom { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
 
   .cell-input {
-    width: 90px;
-    height: 30px;
-    padding: 0 8px;
-    border: 1px solid var(--gray-200);
+    width: 90px; height: 30px; padding: 0 8px;
+    border: 1px solid var(--border);
     border-radius: 6px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--gray-800);
-    background: transparent;
-    outline: none;
+    font-family: var(--font); font-size: 12px;
+    color: var(--text); background: transparent; outline: none;
   }
-
-  .cell-input:focus { border-color: var(--green); background: white; }
+  .cell-input:focus { border-color: var(--accent); background: var(--surface-2); }
+  .cell-input::placeholder { color: var(--text-muted); }
 
   .del-btn {
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    border: 1px solid var(--gray-200);
-    background: transparent;
-    color: var(--gray-400);
-    cursor: pointer;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    width: 26px; height: 26px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text-muted);
+    cursor: pointer; font-size: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
   }
+  .del-btn:hover { background: var(--red-dim); color: var(--red); border-color: rgba(239,68,68,0.3); }
 
-  .del-btn:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
-
-  .row-count { font-size: 12px; color: var(--gray-400); margin-top: 10px; }
+  .row-count { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
 
   /* ADD ROW */
   .add-row-form {
-    display: none;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-    background: var(--green-light);
-    padding: 10px 14px;
-    border-radius: var(--radius);
-    border: 1px solid rgba(26,122,74,0.2);
+    display: none; gap: 8px; margin-bottom: 12px;
+    flex-wrap: wrap; align-items: center;
+    background: var(--accent-dim);
+    padding: 10px 14px; border-radius: var(--radius);
+    border: 1px solid rgba(255,77,0,0.2);
   }
-
   .add-row-form.visible { display: flex; }
-
   .add-row-form input {
-    height: 34px;
-    padding: 0 10px;
-    border: 1px solid rgba(26,122,74,0.3);
-    border-radius: 7px;
-    font-family: var(--font);
-    font-size: 13px;
-    background: white;
-    color: var(--gray-800);
-    outline: none;
+    height: 34px; padding: 0 10px;
+    border: 1px solid rgba(255,77,0,0.25);
+    border-radius: 7px; font-family: var(--font); font-size: 13px;
+    background: var(--surface); color: var(--text); outline: none;
   }
-
-  .add-row-form input:focus { border-color: var(--green); }
+  .add-row-form input::placeholder { color: var(--text-muted); }
+  .add-row-form input:focus { border-color: var(--accent); }
 
   /* IMPORT */
   .import-zone {
-    border: 2px dashed var(--gray-200);
+    border: 2px dashed var(--border);
     border-radius: var(--radius);
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--white);
-    margin-bottom: 20px;
+    padding: 40px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: var(--surface); margin-bottom: 20px;
   }
-
-  .import-zone:hover { border-color: var(--green); background: var(--green-light); }
-
-  .import-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-    color: var(--gray-400);
-  }
-
-  .import-title { font-size: 15px; font-weight: 500; color: var(--gray-800); margin-bottom: 4px; }
-  .import-sub { font-size: 13px; color: var(--gray-400); }
+  .import-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+  .import-icon { font-size: 32px; margin-bottom: 12px; color: var(--text-muted); }
+  .import-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .import-sub { font-size: 13px; color: var(--text-muted); }
 
   .code-block {
-    background: var(--gray-800);
-    color: #a3e635;
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 16px 20px;
-    border-radius: var(--radius);
-    line-height: 1.8;
+    background: #111; color: #a3e635;
+    font-family: 'Courier New', monospace; font-size: 12px;
+    padding: 16px 20px; border-radius: var(--radius); line-height: 1.8;
+    border: 1px solid var(--border);
   }
 
   .import-result {
-    background: var(--green-light);
-    border: 1px solid rgba(26,122,74,0.2);
+    background: var(--accent-dim);
+    border: 1px solid rgba(255,77,0,0.2);
     border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 13px;
-    color: var(--green);
-    font-weight: 500;
-    margin-top: 12px;
+    padding: 12px 16px; font-size: 13px;
+    color: var(--accent); font-weight: 500; margin-top: 12px;
   }
 
   .section-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--gray-400);
-    margin-bottom: 12px;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin-bottom: 12px;
   }
 
-  /* DONUT LEGEND */
+  /* DONUT */
   .donut-container { display: flex; align-items: center; gap: 20px; }
   .legend-list { flex: 1; }
-  .legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+  .legend-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .legend-count { margin-left: auto; font-weight: 600; color: var(--gray-800); }
+  .legend-count { margin-left: auto; font-weight: 600; color: var(--text); }
 
-  /* EMPTY */
-  .empty-state { padding: 40px; text-align: center; color: var(--gray-400); font-size: 13px; }
+  .empty-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: 13px; }
   .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <div class="logo">
     <div class="logo-icon">B</div>
     Bricks — Suivi Webinaires
   </div>
   <div class="header-right">
-    <span class="header-badge" id="header-badge">34 inscrits</span>
+    <div class="sync-status local" id="sync-status">
+      <div class="sync-dot"></div>
+      <span id="sync-label">Local</span>
+    </div>
+    <span class="header-badge" id="header-badge">0 inscrits</span>
+    <button class="icon-btn" title="Paramètres Google Sheets" onclick="openSettings()">⚙️</button>
   </div>
 </div>
 
+<!-- TABS -->
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="showTab('participants')">Participants</button>
@@ -486,6 +494,13 @@
 
   <!-- DASHBOARD -->
   <div class="tab-content active" id="tab-dashboard">
+    <div id="no-sheets-banner" style="display:none;">
+      <div class="connect-banner">
+        <div class="connect-banner-icon">🔗</div>
+        <div><strong>Connecte Google Sheets</strong> pour partager les données entre appareils en temps réel</div>
+        <button class="btn-link" onclick="openSettings()">Connecter</button>
+      </div>
+    </div>
     <div class="kpi-grid" id="kpi-grid"></div>
     <div class="charts-grid">
       <div class="chart-card">
@@ -509,13 +524,13 @@
     <div class="toolbar">
       <input type="text" class="search-input" id="search" placeholder="Rechercher un email..." oninput="renderTable()">
       <div id="filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-      <button class="btn btn-green" onclick="toggleAddRow()">+ Ajouter</button>
+      <button class="btn btn-accent" onclick="toggleAddRow()">+ Ajouter</button>
     </div>
 
     <div class="add-row-form" id="add-row-form">
       <input type="text" id="new-email" placeholder="Email du participant" style="flex:2;min-width:200px;">
       <input type="date" id="new-date" style="flex:1;min-width:130px;">
-      <button class="btn btn-green" onclick="confirmAdd()">Ajouter</button>
+      <button class="btn btn-accent" onclick="confirmAdd()">Ajouter</button>
       <button class="btn" onclick="toggleAddRow()">Annuler</button>
     </div>
 
@@ -525,13 +540,15 @@
           <tr>
             <th style="width:210px;">Email</th>
             <th style="width:110px;">Inscription</th>
-            <th style="width:75px;text-align:center;">Présent</th>
-            <th style="width:75px;text-align:center;">Investi</th>
-            <th style="width:105px;">Montant (€)</th>
+            <th style="width:72px;text-align:center;">Présent</th>
+            <th style="width:72px;text-align:center;">Déposé</th>
+            <th style="width:105px;">Déposé (€)</th>
+            <th style="width:72px;text-align:center;">Investi</th>
+            <th style="width:105px;">Investi (€)</th>
             <th style="width:120px;">1er invest.</th>
-            <th style="width:90px;">Nb projets</th>
-            <th style="width:120px;">Statut</th>
-            <th style="width:80px;text-align:center;">Relancé</th>
+            <th style="width:85px;">Nb projets</th>
+            <th style="width:125px;">Statut</th>
+            <th style="width:75px;text-align:center;">Relancé</th>
             <th style="width:40px;"></th>
           </tr>
         </thead>
@@ -550,14 +567,12 @@
       <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleCSV(event)">
     </div>
     <div id="import-result"></div>
-
     <div style="margin-top:24px;">
       <div class="section-label">Format attendu</div>
       <div class="code-block">
         email,date_inscription<br>
         jean.dupont@gmail.com,2026-03-25<br>
-        marie.martin@yahoo.fr,2026-03-25<br>
-        <br>
+        marie.martin@yahoo.fr,2026-03-25<br><br>
         # La colonne date_inscription est optionnelle.<br>
         # Le fichier d'inscription Bricks (CSV export) est aussi supporté.
       </div>
@@ -566,8 +581,42 @@
 
 </div>
 
+<!-- MODAL SETTINGS -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-title">🔗 Connexion Google Sheets</div>
+    <div class="modal-sub">Les données seront synchronisées en temps réel dans ton Google Sheet.</div>
+
+    <div class="steps">
+      <strong>1.</strong> Ouvre Google Sheets → crée un nouveau classeur<br>
+      <strong>2.</strong> Menu <em>Extensions → Apps Script</em><br>
+      <strong>3.</strong> Colle le code du fichier <code>bricks-apps-script.js</code><br>
+      <strong>4.</strong> <em>Déployer → Nouveau déploiement</em> → Type : <strong>Application Web</strong><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;Accès : <strong>Tout le monde</strong> → Autorise l'accès<br>
+      <strong>5.</strong> Copie l'URL de déploiement ci-dessous
+    </div>
+
+    <label class="modal-label" for="script-url-input">URL du déploiement Apps Script</label>
+    <input
+      type="text"
+      class="modal-input"
+      id="script-url-input"
+      placeholder="https://script.google.com/macros/s/.../exec"
+    >
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeSettings()">Annuler</button>
+      <button class="btn" onclick="disconnectSheets()" id="btn-disconnect" style="display:none;color:var(--red);">Déconnecter</button>
+      <button class="btn btn-accent" onclick="connectSheets()">Connecter & Synchroniser</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const WEBINAR_DATE = '2026-03-26';
+// ─── CONFIG ───────────────────────────────────────────────
+const WEBINAR_DATE    = '2026-03-26';
+const LS_DATA_KEY     = 'bricks_webinar_v4';
+const LS_SCRIPT_KEY   = 'bricks_script_url';
 
 const INITIAL_EMAILS = [
   'alcantara.marine@gmail.com','sophie_loutre84@yahoo.fr','bloudeau.damien1@gmail.com',
@@ -584,41 +633,133 @@ const INITIAL_EMAILS = [
 ];
 
 const UNIQUE = [...new Set(INITIAL_EMAILS)];
-
 let nextId = UNIQUE.length;
 
-function loadData() {
-  const saved = localStorage.getItem('bricks_webinar_v2');
-  if (saved) return JSON.parse(saved);
-  return UNIQUE.map((email, i) => ({
-    id: i, email,
-    date_inscription: '2026-03-23',
-    present: false, investi: false,
-    montant: '', date_invest: '', nb_projets: '',
-    relance: false
-  }));
+// ─── DATA MODEL ───────────────────────────────────────────
+function makeParticipant(id, email, date_inscription) {
+  return {
+    id: Number(id), email,
+    date_inscription: date_inscription || '2026-03-23',
+    present: false, depose: false, montant_depose: '',
+    investi: false, montant_investi: '',
+    date_invest: '', nb_projets: '', relance: false
+  };
 }
 
-function saveData() {
-  localStorage.setItem('bricks_webinar_v2', JSON.stringify(participants));
+function migrateParticipant(p) {
+  if (p.montant !== undefined && p.montant_investi === undefined) {
+    p.montant_investi = p.investi ? p.montant : '';
+    p.montant_depose  = p.depose  ? p.montant : '';
+    delete p.montant;
+  }
+  if (p.depose          === undefined) p.depose          = false;
+  if (p.montant_depose  === undefined) p.montant_depose  = '';
+  if (p.montant_investi === undefined) p.montant_investi = '';
+  // Normalise booleans (can come as strings from Sheets)
+  ['present','depose','investi','relance'].forEach(k => {
+    if (p[k] === 'true')  p[k] = true;
+    if (p[k] === 'false') p[k] = false;
+  });
+  p.id = Number(p.id);
+  return p;
 }
 
-let participants = loadData();
+function loadLocal() {
+  const saved = localStorage.getItem(LS_DATA_KEY);
+  if (saved) return JSON.parse(saved).map(migrateParticipant);
+  // Try old keys
+  for (const key of ['bricks_webinar_v3','bricks_webinar_v2']) {
+    const old = localStorage.getItem(key);
+    if (old) { const m = JSON.parse(old).map(migrateParticipant); saveLocal(m); return m; }
+  }
+  return UNIQUE.map((email, i) => makeParticipant(i, email, '2026-03-23'));
+}
+
+function saveLocal(data) {
+  localStorage.setItem(LS_DATA_KEY, JSON.stringify(data));
+}
+
+function getScriptUrl() { return localStorage.getItem(LS_SCRIPT_KEY) || ''; }
+
+// ─── SYNC ─────────────────────────────────────────────────
+let syncTimer = null;
+
+function setSyncStatus(state, label) {
+  const el = document.getElementById('sync-status');
+  const lb = document.getElementById('sync-label');
+  el.className = 'sync-status ' + state;
+  lb.textContent = label;
+}
+
+async function loadFromSheets() {
+  const url = getScriptUrl();
+  if (!url) return null;
+  setSyncStatus('syncing', 'Chargement…');
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      setSyncStatus('synced', 'Synchronisé');
+      return data.map(migrateParticipant);
+    }
+    throw new Error(data.error || 'Réponse invalide');
+  } catch (err) {
+    setSyncStatus('error', 'Erreur sync');
+    console.error('Sheets load error:', err);
+    return null;
+  }
+}
+
+async function saveToSheets(data) {
+  const url = getScriptUrl();
+  if (!url) return;
+  setSyncStatus('syncing', 'Sauvegarde…');
+  try {
+    // Content-Type: text/plain avoids CORS preflight on Apps Script
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ participants: data })
+    });
+    setSyncStatus('synced', 'Synchronisé');
+  } catch (err) {
+    setSyncStatus('error', 'Erreur sync');
+    console.error('Sheets save error:', err);
+  }
+}
+
+function scheduleSave() {
+  saveLocal(participants);
+  if (!getScriptUrl()) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => saveToSheets(participants), 1500);
+}
+
+// ─── STATE ────────────────────────────────────────────────
+let participants = loadLocal();
 let currentFilter = 'tous';
 let donutInst = null, lineInst = null;
 
+function updateNextId() {
+  nextId = participants.reduce((max, p) => Math.max(max, Number(p.id) + 1), UNIQUE.length);
+}
+updateNextId();
+
+// ─── STATUS ───────────────────────────────────────────────
 function getStatus(p) {
-  if (!p.investi) return 'non-active';
-  if (p.nb_projets && parseInt(p.nb_projets) >= 2) return 'actif';
-  return 'premier-invest';
+  if (p.investi) return p.nb_projets && parseInt(p.nb_projets) >= 2 ? 'actif' : 'premier-invest';
+  if (p.depose) return 'depose-non-invest';
+  return 'non-active';
 }
 
 function statusInfo(s) {
-  if (s === 'actif') return { label: 'Actif', cls: 'badge-green' };
-  if (s === 'premier-invest') return { label: '1er invest.', cls: 'badge-amber' };
-  return { label: 'Non activé', cls: 'badge-red' };
+  if (s === 'actif')             return { label: 'Actif',        cls: 'badge-green' };
+  if (s === 'premier-invest')    return { label: '1er invest.',  cls: 'badge-amber' };
+  if (s === 'depose-non-invest') return { label: 'Déposé',       cls: 'badge-blue'  };
+  return                                { label: 'Non activé',   cls: 'badge-red'   };
 }
 
+// ─── TABS ─────────────────────────────────────────────────
 function showTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -628,23 +769,36 @@ function showTab(tab) {
   if (tab === 'participants') renderTable();
 }
 
+// ─── DASHBOARD ────────────────────────────────────────────
 function renderDashboard() {
-  const total = participants.length;
+  const total    = participants.length;
   const presents = participants.filter(p => p.present).length;
   const investis = participants.filter(p => p.investi).length;
-  const montants = participants.filter(p => p.montant && !isNaN(parseFloat(p.montant))).map(p => parseFloat(p.montant));
-  const avgMontant = montants.length ? Math.round(montants.reduce((a,b) => a+b, 0) / montants.length) : 0;
-  const totalMontant = Math.round(montants.reduce((a,b) => a+b, 0));
+  const deposes  = participants.filter(p => p.depose && !p.investi).length;
   const relances = participants.filter(p => p.relance).length;
-  const tauxPresence = total ? Math.round(presents / total * 100) : 0;
-  const tauxConv = presents ? Math.round(investis / presents * 100) : 0;
-  const delais = participants.filter(p => p.date_invest && p.date_inscription).map(p => {
-    const d1 = new Date(p.date_inscription), d2 = new Date(p.date_invest);
-    return Math.max(0, Math.round((d2 - d1) / 86400000));
+
+  const montantsInvestis = participants
+    .filter(p => p.investi && p.montant_investi !== '' && !isNaN(parseFloat(p.montant_investi)))
+    .map(p => parseFloat(p.montant_investi));
+  const avgInvesti   = montantsInvestis.length ? Math.round(montantsInvestis.reduce((a,b)=>a+b,0) / montantsInvestis.length) : 0;
+  const totalInvesti = Math.round(montantsInvestis.reduce((a,b)=>a+b,0));
+
+  const totalDepose = Math.round(
+    participants
+      .filter(p => p.depose && !p.investi && p.montant_depose !== '' && !isNaN(parseFloat(p.montant_depose)))
+      .reduce((a,p) => a + parseFloat(p.montant_depose), 0)
+  );
+
+  const tauxPresence = total    ? Math.round(presents / total    * 100) : 0;
+  const tauxConv     = presents ? Math.round(investis / presents * 100) : 0;
+
+  const delais = participants.filter(p => p.investi && p.date_invest && p.date_inscription).map(p => {
+    return Math.max(0, Math.round((new Date(p.date_invest) - new Date(p.date_inscription)) / 86400000));
   });
-  const avgDelai = delais.length ? Math.round(delais.reduce((a,b) => a+b, 0) / delais.length) : null;
+  const avgDelai = delais.length ? Math.round(delais.reduce((a,b)=>a+b,0) / delais.length) : null;
 
   document.getElementById('header-badge').textContent = total + ' inscrits';
+  document.getElementById('no-sheets-banner').style.display = getScriptUrl() ? 'none' : 'block';
 
   document.getElementById('kpi-grid').innerHTML = `
     <div class="kpi-card accent">
@@ -653,7 +807,7 @@ function renderDashboard() {
       <div class="kpi-sub">présents → investisseurs</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Inscrits total</div>
+      <div class="kpi-label">Inscrits</div>
       <div class="kpi-value">${total}</div>
       <div class="kpi-sub">webinaire</div>
     </div>
@@ -667,15 +821,20 @@ function renderDashboard() {
       <div class="kpi-value">${investis}</div>
       <div class="kpi-sub">après le webinaire</div>
     </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">Déposé, non investi</div>
+      <div class="kpi-value">${deposes}</div>
+      <div class="kpi-sub">${totalDepose > 0 ? totalDepose + ' € en attente' : 'argent dormant'}</div>
+    </div>
     <div class="kpi-card">
-      <div class="kpi-label">Montant moyen</div>
-      <div class="kpi-value">${avgMontant > 0 ? avgMontant + '€' : '—'}</div>
+      <div class="kpi-label">Montant moyen investi</div>
+      <div class="kpi-value">${avgInvesti > 0 ? avgInvesti + '€' : '—'}</div>
       <div class="kpi-sub">1er investissement</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Total investi</div>
-      <div class="kpi-value">${totalMontant > 0 ? totalMontant + '€' : '—'}</div>
-      <div class="kpi-sub">depuis le webinaire</div>
+      <div class="kpi-value">${totalInvesti > 0 ? totalInvesti + '€' : '—'}</div>
+      <div class="kpi-sub">projets souscrits</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Délai moyen</div>
@@ -690,115 +849,110 @@ function renderDashboard() {
   `;
 
   const nonActives = participants.filter(p => getStatus(p) === 'non-active').length;
-  const premiers = participants.filter(p => getStatus(p) === 'premier-invest').length;
-  const actifs = participants.filter(p => getStatus(p) === 'actif').length;
+  const depNonInv  = participants.filter(p => getStatus(p) === 'depose-non-invest').length;
+  const premiers   = participants.filter(p => getStatus(p) === 'premier-invest').length;
+  const actifs     = participants.filter(p => getStatus(p) === 'actif').length;
 
   if (donutInst) donutInst.destroy();
   donutInst = new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
       datasets: [{
-        data: [nonActives, premiers, actifs],
-        backgroundColor: ['#fca5a5','#fcd34d','#6ee7b7'],
-        borderColor: ['#ef4444','#f59e0b','#10b981'],
-        borderWidth: 1.5
+        data: [nonActives, depNonInv, premiers, actifs],
+        backgroundColor: ['rgba(239,68,68,0.25)','rgba(59,130,246,0.25)','rgba(245,158,11,0.25)','rgba(34,197,94,0.25)'],
+        borderColor: ['#ef4444','#3b82f6','#f59e0b','#22c55e'],
+        borderWidth: 2
       }]
     },
     options: {
-      responsive: false,
-      cutout: '68%',
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => ' ' + ctx.raw + ' participants' }
-      }}
+      responsive: false, cutout: '68%',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + ' participants' } } }
     }
   });
 
   document.getElementById('donut-legend').innerHTML = [
-    { label: 'Non activé', val: nonActives, color: '#ef4444' },
-    { label: '1er invest.', val: premiers, color: '#f59e0b' },
-    { label: 'Actif (2+ projets)', val: actifs, color: '#10b981' }
+    { label: 'Non activé',      val: nonActives, color: '#ef4444' },
+    { label: 'Déposé non inv.', val: depNonInv,  color: '#3b82f6' },
+    { label: '1er invest.',     val: premiers,   color: '#f59e0b' },
+    { label: 'Actif (2+ proj.)',val: actifs,     color: '#22c55e' }
   ].map(l => `
     <div class="legend-row">
       <div class="legend-dot" style="background:${l.color};"></div>
       <span>${l.label}</span>
       <span class="legend-count">${l.val}</span>
-    </div>
-  `).join('');
+    </div>`).join('');
 
   if (lineInst) lineInst.destroy();
   const cumul = [0, 0, Math.round(investis * 0.3), Math.round(investis * 0.65), investis];
   lineInst = new Chart(document.getElementById('lineChart'), {
     type: 'line',
     data: {
-      labels: ['J+1', 'J+3', 'J+7', 'J+14', 'J+30'],
+      labels: ['J+1','J+3','J+7','J+14','J+30'],
       datasets: [{
         data: cumul,
-        borderColor: '#1a7a4a',
-        backgroundColor: 'rgba(26,122,74,0.07)',
-        fill: true,
-        tension: 0.45,
-        pointRadius: 4,
-        pointBackgroundColor: '#1a7a4a',
-        borderWidth: 2
+        borderColor: '#ff4d00', backgroundColor: 'rgba(255,77,0,0.07)',
+        fill: true, tension: 0.45, pointRadius: 4,
+        pointBackgroundColor: '#ff4d00', borderWidth: 2
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: true, ticks: { font: { size: 11 }, stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } },
-        x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+        y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 11 }, stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        x: { ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 11 } }, grid: { display: false } }
       }
     }
   });
 }
 
+// ─── TABLE ────────────────────────────────────────────────
 function renderTable() {
   const search = (document.getElementById('search').value || '').toLowerCase();
   const filtered = participants.filter(p => {
     const matchSearch = !search || p.email.toLowerCase().includes(search);
     const s = getStatus(p);
     const matchFilter =
-      currentFilter === 'tous' ? true :
-      currentFilter === 'a-relancer' ? (!p.investi && !p.relance) :
+      currentFilter === 'tous'              ? true :
+      currentFilter === 'a-relancer'        ? (!p.investi && !p.relance) :
       s === currentFilter;
     return matchSearch && matchFilter;
   });
 
   const tbody = document.getElementById('table-body');
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">◌</div>Aucun participant trouvé</div></td></tr>`;
-  } else {
-    tbody.innerHTML = filtered.map(p => {
-      const s = getStatus(p);
-      const si = statusInfo(s);
-      return `<tr>
-        <td><div class="email-cell" title="${p.email}">${p.email}</div></td>
-        <td style="font-family:var(--mono);font-size:12px;color:#6b7280;">${p.date_inscription}</td>
-        <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.present ? 'checked' : ''} onchange="toggle(${p.id},'present',this.checked)"></td>
-        <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.investi ? 'checked' : ''} onchange="toggle(${p.id},'investi',this.checked)"></td>
-        <td><input type="number" class="cell-input" placeholder="0" value="${p.montant}" onchange="update(${p.id},'montant',this.value)"></td>
-        <td><input type="date" class="cell-input" style="width:115px;" value="${p.date_invest}" onchange="update(${p.id},'date_invest',this.value)"></td>
-        <td><input type="number" class="cell-input" style="width:70px;" placeholder="0" value="${p.nb_projets}" onchange="update(${p.id},'nb_projets',this.value)"></td>
-        <td><span class="badge ${si.cls}">${si.label}</span></td>
-        <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.relance ? 'checked' : ''} onchange="toggle(${p.id},'relance',this.checked)"></td>
-        <td><button class="del-btn" onclick="deleteRow(${p.id})">✕</button></td>
-      </tr>`;
-    }).join('');
-  }
+  tbody.innerHTML = filtered.length === 0
+    ? `<tr><td colspan="12"><div class="empty-state"><div class="empty-icon">◌</div>Aucun participant trouvé</div></td></tr>`
+    : filtered.map(p => {
+        const si = statusInfo(getStatus(p));
+        return `<tr>
+          <td><div class="email-cell" title="${p.email}">${p.email}</div></td>
+          <td style="font-size:12px;color:rgba(255,255,255,0.35);">${p.date_inscription}</td>
+          <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.present  ? 'checked' : ''} onchange="toggle(${p.id},'present',this.checked)"></td>
+          <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.depose   ? 'checked' : ''} onchange="toggle(${p.id},'depose',this.checked)"></td>
+          <td><input type="number" class="cell-input" placeholder="0" value="${p.montant_depose}"  onchange="update(${p.id},'montant_depose',this.value)"></td>
+          <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.investi  ? 'checked' : ''} onchange="toggle(${p.id},'investi',this.checked)"></td>
+          <td><input type="number" class="cell-input" placeholder="0" value="${p.montant_investi}" onchange="update(${p.id},'montant_investi',this.value)"></td>
+          <td><input type="date" class="cell-input" style="width:115px;" value="${p.date_invest}"  onchange="update(${p.id},'date_invest',this.value)"></td>
+          <td><input type="number" class="cell-input" style="width:70px;" placeholder="0" value="${p.nb_projets}" onchange="update(${p.id},'nb_projets',this.value)"></td>
+          <td><span class="badge ${si.cls}">${si.label}</span></td>
+          <td style="text-align:center;"><input type="checkbox" class="check-custom" ${p.relance  ? 'checked' : ''} onchange="toggle(${p.id},'relance',this.checked)"></td>
+          <td><button class="del-btn" onclick="deleteRow(${p.id})">✕</button></td>
+        </tr>`;
+      }).join('');
 
-  document.getElementById('row-count').textContent = `${filtered.length} participant(s) affiché(s) sur ${participants.length}`;
+  document.getElementById('row-count').textContent =
+    `${filtered.length} participant(s) affiché(s) sur ${participants.length}`;
   renderFilterPills();
 }
 
 function renderFilterPills() {
   const filters = [
-    { key: 'tous', label: 'Tous' },
-    { key: 'non-active', label: 'Non activés' },
-    { key: 'premier-invest', label: '1er invest.' },
-    { key: 'actif', label: 'Actifs' },
-    { key: 'a-relancer', label: 'À relancer' }
+    { key: 'tous',              label: 'Tous'               },
+    { key: 'non-active',        label: 'Non activés'        },
+    { key: 'depose-non-invest', label: 'Déposé non invest.' },
+    { key: 'premier-invest',    label: '1er invest.'        },
+    { key: 'actif',             label: 'Actifs'             },
+    { key: 'a-relancer',        label: 'À relancer'         }
   ];
   document.getElementById('filter-pills').innerHTML = filters.map(f =>
     `<button class="filter-pill ${currentFilter === f.key ? 'active' : ''}" onclick="setFilter('${f.key}')">${f.label}</button>`
@@ -809,18 +963,23 @@ function setFilter(f) { currentFilter = f; renderTable(); }
 
 function toggle(id, field, val) {
   const p = participants.find(x => x.id === id);
-  if (p) { p[field] = val; saveData(); renderTable(); renderDashboard(); }
+  if (!p) return;
+  p[field] = val;
+  if (field === 'investi' && val) p.depose = true;
+  scheduleSave();
+  renderTable();
+  renderDashboard();
 }
 
 function update(id, field, val) {
   const p = participants.find(x => x.id === id);
-  if (p) { p[field] = val; saveData(); }
+  if (p) { p[field] = val; scheduleSave(); }
 }
 
 function deleteRow(id) {
   if (!confirm('Supprimer ce participant ?')) return;
   participants = participants.filter(x => x.id !== id);
-  saveData();
+  scheduleSave();
   renderTable();
   renderDashboard();
 }
@@ -836,17 +995,18 @@ function toggleAddRow() {
 
 function confirmAdd() {
   const email = document.getElementById('new-email').value.trim();
-  const date = document.getElementById('new-date').value || WEBINAR_DATE;
+  const date  = document.getElementById('new-date').value || WEBINAR_DATE;
   if (!email || !email.includes('@')) return alert('Email invalide');
   if (participants.find(p => p.email === email)) return alert('Cet email existe déjà');
-  participants.push({ id: nextId++, email, date_inscription: date, present: false, investi: false, montant: '', date_invest: '', nb_projets: '', relance: false });
-  saveData();
+  participants.push(makeParticipant(nextId++, email, date));
+  scheduleSave();
   document.getElementById('new-email').value = '';
   toggleAddRow();
   renderTable();
   renderDashboard();
 }
 
+// ─── CSV IMPORT ───────────────────────────────────────────
 function handleCSV(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -854,34 +1014,98 @@ function handleCSV(e) {
   reader.onload = function(ev) {
     const lines = ev.target.result.split('\n').filter(l => l.trim());
     if (lines.length < 2) return;
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, '').replace(/\s+/g,'_'));
+    const headers  = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,'').replace(/\s+/g,'_'));
     const emailIdx = headers.findIndex(h => h.includes('email'));
     if (emailIdx === -1) {
-      document.getElementById('import-result').innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 16px;color:#ef4444;font-size:13px;">Colonne "email" introuvable dans le fichier.</div>';
+      document.getElementById('import-result').innerHTML =
+        '<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px 16px;color:#ef4444;font-size:13px;">Colonne "email" introuvable.</div>';
       return;
     }
     const dateIdx = headers.findIndex(h => h.includes('date'));
     let added = 0;
     for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
+      const cols  = lines[i].split(',').map(c => c.trim().replace(/"/g,''));
       const email = cols[emailIdx];
       if (!email || !email.includes('@') || email.includes('{{')) continue;
       if (participants.find(p => p.email === email)) continue;
-      const date = dateIdx !== -1 && cols[dateIdx] ? cols[dateIdx].substring(0, 10) : WEBINAR_DATE;
-      participants.push({ id: nextId++, email, date_inscription: date, present: false, investi: false, montant: '', date_invest: '', nb_projets: '', relance: false });
+      const date = dateIdx !== -1 && cols[dateIdx] ? cols[dateIdx].substring(0,10) : WEBINAR_DATE;
+      participants.push(makeParticipant(nextId++, email, date));
       added++;
     }
-    saveData();
-    document.getElementById('import-result').innerHTML = `<div class="import-result">${added} nouveau(x) participant(s) importé(s) — ${participants.length} au total</div>`;
+    scheduleSave();
+    document.getElementById('import-result').innerHTML =
+      `<div class="import-result">${added} nouveau(x) participant(s) importé(s) — ${participants.length} au total</div>`;
     renderTable();
     renderDashboard();
   };
   reader.readAsText(file);
 }
 
-// INIT
-renderDashboard();
-renderTable();
+// ─── SETTINGS MODAL ───────────────────────────────────────
+function openSettings() {
+  const url = getScriptUrl();
+  document.getElementById('script-url-input').value = url;
+  document.getElementById('btn-disconnect').style.display = url ? 'inline-flex' : 'none';
+  document.getElementById('settings-modal').classList.add('visible');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('visible');
+}
+
+async function connectSheets() {
+  const url = document.getElementById('script-url-input').value.trim();
+  if (!url || !url.startsWith('https://script.google.com')) {
+    return alert('URL invalide. Elle doit commencer par https://script.google.com');
+  }
+  localStorage.setItem(LS_SCRIPT_KEY, url);
+  closeSettings();
+
+  // Charge les données depuis Sheets (priorité sur le local)
+  const remote = await loadFromSheets();
+  if (remote && remote.length > 0) {
+    participants = remote;
+    updateNextId();
+    saveLocal(participants);
+  } else if (remote !== null) {
+    // Sheets vide → envoie les données locales
+    await saveToSheets(participants);
+  }
+
+  renderDashboard();
+  renderTable();
+}
+
+function disconnectSheets() {
+  if (!confirm('Déconnecter Google Sheets ? Les données locales sont conservées.')) return;
+  localStorage.removeItem(LS_SCRIPT_KEY);
+  setSyncStatus('local', 'Local');
+  document.getElementById('btn-disconnect').style.display = 'none';
+  closeSettings();
+  renderDashboard();
+}
+
+// Ferme la modale si clic en dehors
+document.getElementById('settings-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
+// ─── INIT ─────────────────────────────────────────────────
+(async function init() {
+  const url = getScriptUrl();
+  if (url) {
+    const remote = await loadFromSheets();
+    if (remote && remote.length > 0) {
+      participants = remote;
+      updateNextId();
+      saveLocal(participants);
+    }
+  } else {
+    setSyncStatus('local', 'Local');
+  }
+  renderDashboard();
+  renderTable();
+})();
 </script>
 </body>
 </html>
