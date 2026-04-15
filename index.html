@@ -789,8 +789,9 @@ function renderDashboard() {
       .reduce((a,p) => a + parseFloat(p.montant_depose), 0)
   );
 
-  const tauxPresence = total    ? Math.round(presents / total    * 100) : 0;
-  const tauxConv     = presents ? Math.round(investis / presents * 100) : 0;
+  const tauxPresence      = total    ? Math.round(presents / total    * 100) : 0;
+  const tauxConv          = presents ? Math.round(investis / presents * 100) : 0;
+  const tauxConvInscrits  = total    ? Math.round(investis / total    * 100) : 0;
 
   const delais = participants.filter(p => p.investi && p.date_invest && p.date_inscription).map(p => {
     return Math.max(0, Math.round((new Date(p.date_invest) - new Date(p.date_inscription)) / 86400000));
@@ -802,7 +803,12 @@ function renderDashboard() {
 
   document.getElementById('kpi-grid').innerHTML = `
     <div class="kpi-card accent">
-      <div class="kpi-label">Taux de conversion</div>
+      <div class="kpi-label">Conversion inscrits</div>
+      <div class="kpi-value">${tauxConvInscrits}%</div>
+      <div class="kpi-sub">inscrits → investisseurs</div>
+    </div>
+    <div class="kpi-card accent" style="background:var(--accent-hover);">
+      <div class="kpi-label">Conversion présents</div>
       <div class="kpi-value">${tauxConv}%</div>
       <div class="kpi-sub">présents → investisseurs</div>
     </div>
